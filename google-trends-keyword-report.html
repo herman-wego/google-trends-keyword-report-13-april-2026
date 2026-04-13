@@ -1,0 +1,933 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Google Trends Keyword Report — Wego Blog (Airlines Focus)</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0f1117;
+    --card: #1a1d27;
+    --card-hover: #1f2231;
+    --border: #2a2d3a;
+    --text: #e2e4eb;
+    --text-muted: #8b8fa3;
+    --accent: #6366f1;
+    --accent-light: #818cf8;
+    --red: #ef4444;
+    --red-bg: rgba(239,68,68,0.08);
+    --red-border: rgba(239,68,68,0.25);
+    --amber: #f59e0b;
+    --amber-bg: rgba(245,158,11,0.08);
+    --amber-border: rgba(245,158,11,0.25);
+    --green: #22c55e;
+    --green-bg: rgba(34,197,94,0.08);
+    --purple: #a855f7;
+    --purple-bg: rgba(168,85,247,0.08);
+    --blue: #3b82f6;
+    --blue-bg: rgba(59,130,246,0.08);
+    --pink: #ec4899;
+    --pink-bg: rgba(236,72,153,0.08);
+    --orange: #f97316;
+    --orange-bg: rgba(249,115,22,0.08);
+    --cyan: #06b6d4;
+    --cyan-bg: rgba(6,182,212,0.08);
+    --gray: #6b7280;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.6;
+    padding: 2rem;
+  }
+
+  .container { max-width: 1100px; margin: 0 auto; }
+
+  /* Header */
+  .header {
+    text-align: center;
+    padding: 3rem 2rem;
+    margin-bottom: 2rem;
+    background: linear-gradient(135deg, rgba(99,102,241,0.15) 0%, rgba(168,85,247,0.1) 50%, rgba(236,72,153,0.08) 100%);
+    border-radius: 16px;
+    border: 1px solid var(--border);
+  }
+  .header h1 {
+    font-size: 2rem;
+    font-weight: 800;
+    background: linear-gradient(135deg, #818cf8, #c084fc, #f472b6);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    margin-bottom: 0.5rem;
+  }
+  .header .subtitle {
+    color: var(--text-muted);
+    font-size: 1rem;
+    margin-bottom: 1rem;
+  }
+  .header .focus-tag {
+    display: inline-block;
+    background: rgba(239,68,68,0.12);
+    color: var(--red);
+    padding: 0.3rem 1rem;
+    border-radius: 20px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    border: 1px solid var(--red-border);
+    margin-bottom: 0.75rem;
+  }
+  .date-badge {
+    display: inline-block;
+    background: var(--card);
+    color: var(--text-muted);
+    padding: 0.3rem 0.8rem;
+    border-radius: 8px;
+    font-size: 0.8rem;
+    border: 1px solid var(--border);
+  }
+
+  /* Section titles */
+  .section-title {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: var(--text);
+    margin: 2.5rem 0 1rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+  .section-title .icon { font-size: 1.2rem; }
+
+  /* News context */
+  .news-box {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 1.5rem;
+    margin-bottom: 1.5rem;
+  }
+  .news-item {
+    padding: 0.6rem 0;
+    border-bottom: 1px solid var(--border);
+    font-size: 0.9rem;
+  }
+  .news-item:last-child { border-bottom: none; }
+  .news-item strong { color: var(--accent-light); }
+  .news-item .why { color: var(--text-muted); font-size: 0.82rem; }
+
+  /* Stats cards */
+  .stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+  }
+  .stat-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 1.25rem;
+    text-align: center;
+  }
+  .stat-card .number {
+    font-size: 2rem;
+    font-weight: 800;
+    background: linear-gradient(135deg, var(--accent-light), var(--purple));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+  .stat-card .number.urgent {
+    background: linear-gradient(135deg, var(--red), var(--amber));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+  .stat-card .label {
+    color: var(--text-muted);
+    font-size: 0.8rem;
+    font-weight: 500;
+    margin-top: 0.25rem;
+  }
+
+  /* Executive summary */
+  .exec-summary {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 1.5rem;
+    margin-bottom: 1.5rem;
+    font-size: 0.92rem;
+    line-height: 1.7;
+  }
+
+  /* Alert banners */
+  .alert {
+    border-radius: 12px;
+    padding: 1rem 1.25rem;
+    margin-bottom: 0.75rem;
+    font-size: 0.88rem;
+    display: flex;
+    gap: 0.75rem;
+    align-items: flex-start;
+  }
+  .alert-red {
+    background: var(--red-bg);
+    border: 1px solid var(--red-border);
+    color: #fca5a5;
+  }
+  .alert-amber {
+    background: var(--amber-bg);
+    border: 1px solid var(--amber-border);
+    color: #fcd34d;
+  }
+  .alert .alert-icon { font-size: 1.1rem; flex-shrink: 0; margin-top: 2px; }
+  .alert .alert-text strong { color: #fff; }
+
+  /* Keyword cards */
+  .keyword-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 1.25rem;
+    margin-bottom: 0.75rem;
+    display: flex;
+    gap: 1rem;
+    align-items: flex-start;
+    transition: background 0.15s;
+    border-left: 4px solid var(--gray);
+  }
+  .keyword-card:hover { background: var(--card-hover); }
+  .keyword-card.priority-write-now { border-left-color: var(--red); }
+  .keyword-card.priority-audit { border-left-color: var(--red); }
+  .keyword-card.priority-high { border-left-color: var(--amber); }
+  .keyword-card.priority-medium { border-left-color: var(--gray); }
+  .keyword-card.priority-evergreen { border-left-color: var(--gray); }
+
+  .kw-rank {
+    font-size: 1.4rem;
+    font-weight: 800;
+    color: var(--text-muted);
+    min-width: 32px;
+    text-align: center;
+    line-height: 1;
+    padding-top: 4px;
+  }
+  .kw-body { flex: 1; }
+  .kw-title {
+    font-weight: 700;
+    font-size: 1rem;
+    margin-bottom: 0.35rem;
+  }
+  .kw-note {
+    font-size: 0.84rem;
+    color: var(--text-muted);
+    margin-bottom: 0.6rem;
+    line-height: 1.5;
+  }
+  .kw-tags { display: flex; flex-wrap: wrap; gap: 0.4rem; }
+
+  .tag {
+    display: inline-block;
+    padding: 0.2rem 0.6rem;
+    border-radius: 6px;
+    font-size: 0.72rem;
+    font-weight: 600;
+    letter-spacing: 0.02em;
+  }
+  .tag-growth-breakout { background: rgba(239,68,68,0.15); color: var(--red); }
+  .tag-growth-high { background: rgba(245,158,11,0.15); color: var(--amber); }
+  .tag-growth-moderate { background: rgba(34,197,94,0.15); color: var(--green); }
+
+  .tag-type-crisis { background: rgba(239,68,68,0.1); color: #fca5a5; border: 1px solid rgba(239,68,68,0.2); }
+  .tag-type-visa { background: var(--purple-bg); color: #d8b4fe; border: 1px solid rgba(168,85,247,0.2); }
+  .tag-type-flights { background: var(--green-bg); color: #86efac; border: 1px solid rgba(34,197,94,0.2); }
+  .tag-type-hotel { background: var(--pink-bg); color: #f9a8d4; border: 1px solid rgba(236,72,153,0.2); }
+  .tag-type-destination { background: var(--blue-bg); color: #93c5fd; border: 1px solid rgba(59,130,246,0.2); }
+  .tag-type-seasonal { background: var(--orange-bg); color: #fdba74; border: 1px solid rgba(249,115,22,0.2); }
+  .tag-type-tips { background: var(--cyan-bg); color: #67e8f9; border: 1px solid rgba(6,182,212,0.2); }
+  .tag-type-insurance { background: rgba(168,85,247,0.1); color: #d8b4fe; border: 1px solid rgba(168,85,247,0.2); }
+
+  .tag-priority {
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    font-size: 0.68rem;
+  }
+  .tag-priority-write-now { background: rgba(239,68,68,0.2); color: var(--red); border: 1px solid var(--red-border); }
+  .tag-priority-audit { background: rgba(245,158,11,0.15); color: var(--amber); border: 1px solid var(--amber-border); }
+  .tag-priority-high { background: rgba(245,158,11,0.1); color: var(--amber); border: 1px solid rgba(245,158,11,0.15); }
+  .tag-priority-medium { background: rgba(107,114,128,0.15); color: var(--text-muted); border: 1px solid rgba(107,114,128,0.2); }
+  .tag-priority-evergreen { background: rgba(107,114,128,0.1); color: var(--text-muted); border: 1px solid rgba(107,114,128,0.15); }
+
+  .tag-source {
+    background: rgba(99,102,241,0.1);
+    color: var(--accent-light);
+    border: 1px solid rgba(99,102,241,0.2);
+  }
+
+  /* Cluster grid */
+  .cluster-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(480px, 1fr));
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+  }
+  .cluster-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 1.25rem;
+  }
+  .cluster-title {
+    font-weight: 700;
+    font-size: 0.95rem;
+    margin-bottom: 0.4rem;
+  }
+  .cluster-desc {
+    font-size: 0.82rem;
+    color: var(--text-muted);
+    margin-bottom: 0.75rem;
+    line-height: 1.5;
+  }
+  .cluster-keywords { display: flex; flex-wrap: wrap; gap: 0.4rem; }
+  .cluster-kw {
+    display: inline-block;
+    background: rgba(99,102,241,0.08);
+    border: 1px solid rgba(99,102,241,0.15);
+    color: var(--accent-light);
+    padding: 0.2rem 0.6rem;
+    border-radius: 6px;
+    font-size: 0.75rem;
+    font-weight: 500;
+  }
+  .cluster-kw .growth {
+    color: var(--amber);
+    font-weight: 700;
+    margin-left: 0.3rem;
+  }
+
+  /* Footer */
+  .footer {
+    text-align: center;
+    padding: 2rem 1rem;
+    margin-top: 2rem;
+    border-top: 1px solid var(--border);
+    color: var(--text-muted);
+    font-size: 0.78rem;
+  }
+  .footer a { color: var(--accent-light); text-decoration: none; }
+
+  @media (max-width: 640px) {
+    body { padding: 1rem; }
+    .header h1 { font-size: 1.5rem; }
+    .cluster-grid { grid-template-columns: 1fr; }
+    .keyword-card { flex-direction: column; }
+    .kw-rank { min-width: auto; }
+  }
+</style>
+</head>
+<body>
+<div class="container">
+
+  <!-- HEADER -->
+  <div class="header">
+    <div class="focus-tag">AIRLINES FOCUS &mdash; US-Iran War Context</div>
+    <h1>Google Trends Keyword Report</h1>
+    <p class="subtitle">Wego Blog &mdash; Rising airline & aviation queries you should write about</p>
+    <span class="date-badge">13 April 2026 &bull; Worldwide scope &bull; 7-day &amp; 90-day windows</span>
+  </div>
+
+  <!-- NEWS CONTEXT -->
+  <div class="section-title"><span class="icon">&#128240;</span> News Context</div>
+  <div class="news-box">
+    <div class="news-item">
+      <strong>Two-week US-Iran ceasefire announced 7 April.</strong> Iraq, Syria, and Bahrain reopen airspace; Iran, Kuwait, and parts of UAE remain restricted.
+      <div class="why">&#8594; Drives surge in "which airlines resume" and "airspace reopened" searches.</div>
+    </div>
+    <div class="news-item">
+      <strong>Emirates at ~60% capacity, Etihad at ~20%, Qatar Airways at ~35-40%.</strong> Gulf carriers operating far below pre-war levels; 64+ destinations still suspended by Qatar Airways alone.
+      <div class="why">&#8594; Sustained demand for "[airline] flight status" and "[airline] refund" queries across every Gulf carrier.</div>
+    </div>
+    <div class="news-item">
+      <strong>British Airways, Lufthansa, KLM extend Middle East suspensions deep into 2026.</strong> BA Dubai cancelled through May; Lufthansa Group to Oct 2026; KLM to May.
+      <div class="why">&#8594; European travellers searching for alternative routes and carrier-specific cancellation policies.</div>
+    </div>
+    <div class="news-item">
+      <strong>Kuwait International Airport remains closed — physical damage from drone strikes.</strong> Kuwait Airways operating out of Dammam, Saudi Arabia.
+      <div class="why">&#8594; "Kuwait airport open" and "Kuwait Airways Dammam flights" are persistent high-volume queries.</div>
+    </div>
+    <div class="news-item">
+      <strong>Average international economy fares up 29% ($774 &rarr; $998 round-trip) since Feb 28.</strong> Jet fuel up ~30% due to Strait of Hormuz threats.
+      <div class="why">&#8594; Drives searches for "cheap flights avoiding Middle East," "airfare increase 2026," and alternative hub routing.</div>
+    </div>
+  </div>
+
+  <!-- STATS -->
+  <div class="section-title"><span class="icon">&#128202;</span> Summary Stats</div>
+  <div class="stats-grid">
+    <div class="stat-card">
+      <div class="number urgent">11</div>
+      <div class="label">Urgent Keywords (Write Now / Audit)</div>
+    </div>
+    <div class="stat-card">
+      <div class="number">28</div>
+      <div class="label">Total Keywords Identified</div>
+    </div>
+    <div class="stat-card">
+      <div class="number">6</div>
+      <div class="label">Thematic Clusters</div>
+    </div>
+    <div class="stat-card">
+      <div class="number">22</div>
+      <div class="label">News-Derived Discoveries</div>
+    </div>
+  </div>
+
+  <!-- EXECUTIVE SUMMARY -->
+  <div class="section-title"><span class="icon">&#128161;</span> Executive Summary</div>
+  <div class="exec-summary">
+    The 7 April ceasefire has triggered a new wave of airline-related search demand: travellers are no longer just asking "is my flight cancelled?" &mdash; they're now asking "when does my airline resume?" and "which routes are back?" <strong>The biggest content gap is around European and US carrier resumption timelines</strong> (Lufthansa, BA, Delta, United, Air France/KLM), where Wego has limited or no coverage despite strong search interest. Gulf carrier articles (Emirates, Qatar Airways, Etihad, flydubai) are well-covered but need urgent audits to reflect ceasefire developments and updated waiver dates. A secondary opportunity exists around <strong>alternative routing content</strong> &mdash; searches for flights via Istanbul, Central Asia, and direct Europe-Asia routes are surging as passengers seek workarounds for the closed Middle Eastern corridor.
+  </div>
+
+  <!-- TIME-SENSITIVE ALERTS -->
+  <div class="section-title"><span class="icon">&#9888;&#65039;</span> Time-Sensitive Alerts</div>
+
+  <div class="alert alert-red">
+    <span class="alert-icon">&#128308;</span>
+    <div class="alert-text"><strong>WRITE NOW:</strong> "Lufthansa flight cancellation refund 2026" &mdash; Lufthansa Group has suspended 8+ ME destinations until October 2026. No Wego article exists. Millions of affected passengers across Lufthansa, Swiss, Austrian, and Brussels Airlines brands.</div>
+  </div>
+  <div class="alert alert-red">
+    <span class="alert-icon">&#128308;</span>
+    <div class="alert-text"><strong>WRITE NOW:</strong> "Singapore Airlines flights Middle East 2026" &mdash; All SQ Middle East flights suspended. No dedicated Wego article. SQ is a core carrier for Wego's APAC audience.</div>
+  </div>
+  <div class="alert alert-red">
+    <span class="alert-icon">&#128308;</span>
+    <div class="alert-text"><strong>WRITE NOW:</strong> "Air France KLM flight cancellation Middle East 2026" &mdash; AF suspended Dubai/Riyadh until Apr 19; KLM until May 17. No dedicated Wego article for either carrier.</div>
+  </div>
+  <div class="alert alert-red">
+    <span class="alert-icon">&#128308;</span>
+    <div class="alert-text"><strong>WRITE NOW:</strong> "Cheap flights avoiding Middle East" / "Europe to Asia flights alternative route 2026" &mdash; Massive search demand from rerouted passengers. Wego has one rerouting article but no price-focused alternatives guide.</div>
+  </div>
+  <div class="alert alert-amber">
+    <span class="alert-icon">&#128992;</span>
+    <div class="alert-text"><strong>AUDIT:</strong> All 6 existing Gulf carrier cancellation articles (Emirates, Qatar Airways, Etihad, flydubai, Gulf Air, Kuwait Airways) need ceasefire updates, new waiver dates, and updated capacity percentages.</div>
+  </div>
+  <div class="alert alert-amber">
+    <span class="alert-icon">&#128992;</span>
+    <div class="alert-text"><strong>AUDIT:</strong> Airport status articles (Dubai, Kuwait, Doha, Bahrain, Amman, Baghdad) &mdash; ceasefire changed status of several airports; Iraq/Syria/Bahrain airspace now open.</div>
+  </div>
+
+  <!-- PRIORITIZED KEYWORD LIST -->
+  <div class="section-title"><span class="icon">&#127942;</span> Prioritized Keywords</div>
+
+  <!-- #1 -->
+  <div class="keyword-card priority-write-now">
+    <div class="kw-rank">1</div>
+    <div class="kw-body">
+      <div class="kw-title">Lufthansa flight cancellation refund Middle East 2026</div>
+      <div class="kw-note">Lufthansa Group (incl. Swiss, Austrian, Brussels) suspended 8+ ME destinations until Oct 2026. Millions of affected pax across all sub-brands. Zero Wego coverage. High search volume from European travellers to Gulf destinations.</div>
+      <div class="kw-tags">
+        <span class="tag tag-growth-breakout">Breakout</span>
+        <span class="tag tag-type-crisis">Crisis / Airline</span>
+        <span class="tag tag-priority tag-priority-write-now">Write Now</span>
+        <span class="tag tag-source">News-derived</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- #2 -->
+  <div class="keyword-card priority-write-now">
+    <div class="kw-rank">2</div>
+    <div class="kw-body">
+      <div class="kw-title">Singapore Airlines flights cancelled Middle East 2026</div>
+      <div class="kw-note">All SQ and Scoot ME flights suspended. Key carrier for Wego's Singapore, ASEAN, and India audiences. No dedicated Wego article. Pax searching for status, refund process, and SQ rerouting options.</div>
+      <div class="kw-tags">
+        <span class="tag tag-growth-breakout">Breakout</span>
+        <span class="tag tag-type-crisis">Crisis / Airline</span>
+        <span class="tag tag-priority tag-priority-write-now">Write Now</span>
+        <span class="tag tag-source">News-derived</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- #3 -->
+  <div class="keyword-card priority-write-now">
+    <div class="kw-rank">3</div>
+    <div class="kw-body">
+      <div class="kw-title">Air France KLM flight cancellation refund Middle East 2026</div>
+      <div class="kw-note">Air France suspended Tel Aviv, Beirut, Dubai, Riyadh until Apr 19. KLM suspended Tel Aviv, Riyadh, Dammam, Dubai until May 17. No Wego coverage for either AF or KLM cancellation policies.</div>
+      <div class="kw-tags">
+        <span class="tag tag-growth-breakout">Breakout</span>
+        <span class="tag tag-type-crisis">Crisis / Airline</span>
+        <span class="tag tag-priority tag-priority-write-now">Write Now</span>
+        <span class="tag tag-source">News-derived</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- #4 -->
+  <div class="keyword-card priority-write-now">
+    <div class="kw-rank">4</div>
+    <div class="kw-body">
+      <div class="kw-title">Cheap flights avoiding Middle East / Europe to Asia alternative routes 2026</div>
+      <div class="kw-note">Rerouting adds 6-12 hours and $200-500 to Europe-Asia journeys. Massive demand for price-focused guide on cheapest ways to fly without Middle East transit. Wego has a rerouting explainer but no fare-comparison or alternatives booking guide.</div>
+      <div class="kw-tags">
+        <span class="tag tag-growth-breakout">Breakout</span>
+        <span class="tag tag-type-flights">Flights / Routing</span>
+        <span class="tag tag-priority tag-priority-write-now">Write Now</span>
+        <span class="tag tag-source">News-derived</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- #5 -->
+  <div class="keyword-card priority-write-now">
+    <div class="kw-rank">5</div>
+    <div class="kw-body">
+      <div class="kw-title">Delta United American Airlines Middle East flights resume 2026</div>
+      <div class="kw-note">US carriers suspended all ME routes. Delta may restart late May; United mid-June. Huge US audience searching for resumption dates. No Wego article covers US carrier-specific status or refund policies.</div>
+      <div class="kw-tags">
+        <span class="tag tag-growth-high">500%+</span>
+        <span class="tag tag-type-crisis">Crisis / Airline</span>
+        <span class="tag tag-priority tag-priority-write-now">Write Now</span>
+        <span class="tag tag-source">News-derived</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- #6 -->
+  <div class="keyword-card priority-write-now">
+    <div class="kw-rank">6</div>
+    <div class="kw-body">
+      <div class="kw-title">Wizz Air Tel Aviv flights resume April 2026</div>
+      <div class="kw-note">Wizz Air announced Apr 25 resumption to Tel Aviv; Bluebird started daily Athens flights Apr 12. First carriers returning to Israel. Highly time-sensitive &mdash; no Wego coverage of Israel flight resumption.</div>
+      <div class="kw-tags">
+        <span class="tag tag-growth-breakout">Breakout</span>
+        <span class="tag tag-type-crisis">Crisis / Airline</span>
+        <span class="tag tag-priority tag-priority-write-now">Write Now</span>
+        <span class="tag tag-source">News-derived</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- #7 -->
+  <div class="keyword-card priority-audit">
+    <div class="kw-rank">7</div>
+    <div class="kw-body">
+      <div class="kw-title">Emirates flights cancelled / Emirates refund 2026</div>
+      <div class="kw-note">Emirates now at ~60% capacity post-ceasefire. Wego has comprehensive articles but they need updates: new rebooking deadline (June 2026), capacity percentage, resumed routes, ceasefire impact.</div>
+      <div class="kw-tags">
+        <span class="tag tag-growth-breakout">Breakout</span>
+        <span class="tag tag-type-crisis">Crisis / Airline</span>
+        <span class="tag tag-priority tag-priority-audit">Audit</span>
+        <span class="tag tag-source">News-derived</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- #8 -->
+  <div class="keyword-card priority-audit">
+    <div class="kw-rank">8</div>
+    <div class="kw-body">
+      <div class="kw-title">Qatar Airways flights cancelled / Qatar Airways refund 2026</div>
+      <div class="kw-note">QR operating ~80 daily flights (~35-40% capacity), 64 destinations still suspended. Wego has articles &mdash; audit needed for updated waiver (rebook up to Oct 2026), limited schedule details, and ceasefire status.</div>
+      <div class="kw-tags">
+        <span class="tag tag-growth-breakout">Breakout</span>
+        <span class="tag tag-type-crisis">Crisis / Airline</span>
+        <span class="tag tag-priority tag-priority-audit">Audit</span>
+        <span class="tag tag-source">News-derived</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- #9 -->
+  <div class="keyword-card priority-audit">
+    <div class="kw-rank">9</div>
+    <div class="kw-body">
+      <div class="kw-title">Etihad refund / Etihad flights cancelled 2026</div>
+      <div class="kw-note">Etihad at ~20% pre-war capacity. New waiver: tickets for cancelled flights can rebook free until June 15, 2026 (from Apr 16). Wego article needs this critical date update and capacity status.</div>
+      <div class="kw-tags">
+        <span class="tag tag-growth-breakout">Breakout</span>
+        <span class="tag tag-type-crisis">Crisis / Airline</span>
+        <span class="tag tag-priority tag-priority-audit">Audit</span>
+        <span class="tag tag-source">News-derived</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- #10 -->
+  <div class="keyword-card priority-audit">
+    <div class="kw-rank">10</div>
+    <div class="kw-body">
+      <div class="kw-title">Is Kuwait airport open / Kuwait airport status 2026</div>
+      <div class="kw-note">Kuwait airport remains CLOSED despite ceasefire &mdash; physical drone damage. Kuwait Airways operating from Dammam. Wego article exists but must be updated to reflect post-ceasefire status and confirm continued closure.</div>
+      <div class="kw-tags">
+        <span class="tag tag-growth-high">500%+</span>
+        <span class="tag tag-type-crisis">Airport Status</span>
+        <span class="tag tag-priority tag-priority-audit">Audit</span>
+        <span class="tag tag-source">News-derived</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- #11 -->
+  <div class="keyword-card priority-audit">
+    <div class="kw-rank">11</div>
+    <div class="kw-body">
+      <div class="kw-title">Dubai airport flights / Is Dubai airport open April 2026</div>
+      <div class="kw-note">DXB open, handling ~220 daily flights (mostly Emirates/flydubai). Wego has articles but needs ceasefire update, current flight count, and list of international carriers that have NOT returned yet.</div>
+      <div class="kw-tags">
+        <span class="tag tag-growth-high">500%+</span>
+        <span class="tag tag-type-crisis">Airport Status</span>
+        <span class="tag tag-priority tag-priority-audit">Audit</span>
+        <span class="tag tag-source">News-derived</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- #12 -->
+  <div class="keyword-card priority-high">
+    <div class="kw-rank">12</div>
+    <div class="kw-body">
+      <div class="kw-title">Airfare increase 2026 / flight prices Iran war</div>
+      <div class="kw-note">Average international economy fares up 29% since Feb 28. Jet fuel up ~30%. Fare premiums of $200-500 on rerouted Europe-Asia flights. Strong search demand, no dedicated Wego article on price impact.</div>
+      <div class="kw-tags">
+        <span class="tag tag-growth-high">400%+</span>
+        <span class="tag tag-type-flights">Flights / Pricing</span>
+        <span class="tag tag-priority tag-priority-high">High Priority</span>
+        <span class="tag tag-source">News-derived</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- #13 -->
+  <div class="keyword-card priority-high">
+    <div class="kw-rank">13</div>
+    <div class="kw-body">
+      <div class="kw-title">Turkish Airlines alternative to Emirates / fly via Istanbul 2026</div>
+      <div class="kw-note">Turkish Airlines operating as de facto alternative hub for Europe-Asia-Africa routing. Searches for TK as Gulf carrier replacement surging. Wego has no dedicated article on Turkish Airlines as alternative.</div>
+      <div class="kw-tags">
+        <span class="tag tag-growth-high">350%+</span>
+        <span class="tag tag-type-flights">Flights / Routing</span>
+        <span class="tag tag-priority tag-priority-high">High Priority</span>
+        <span class="tag tag-source">News-derived</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- #14 -->
+  <div class="keyword-card priority-high">
+    <div class="kw-rank">14</div>
+    <div class="kw-body">
+      <div class="kw-title">Every airline waiver Middle East 2026 / complete list airline cancellation policies</div>
+      <div class="kw-note">Travellers want a single reference for ALL airline waivers. Wego's "flight cancellations Middle East" article is the closest but may not include every carrier or latest dates. Strong aggregation play.</div>
+      <div class="kw-tags">
+        <span class="tag tag-growth-high">300%+</span>
+        <span class="tag tag-type-crisis">Crisis / Airline</span>
+        <span class="tag tag-priority tag-priority-high">High Priority</span>
+        <span class="tag tag-source">News-derived</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- #15 -->
+  <div class="keyword-card priority-high">
+    <div class="kw-rank">15</div>
+    <div class="kw-body">
+      <div class="kw-title">When will international airlines return to Dubai 2026</div>
+      <div class="kw-note">BA July 1, Lufthansa Oct, KLM May, flydubai late April, Delta late May. Wego HAS this article &mdash; needs audit with ceasefire-triggered timeline updates. Very high search volume from UAE residents.</div>
+      <div class="kw-tags">
+        <span class="tag tag-growth-high">350%+</span>
+        <span class="tag tag-type-crisis">Crisis / Airline</span>
+        <span class="tag tag-priority tag-priority-audit">Audit</span>
+        <span class="tag tag-source">News-derived</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- #16 -->
+  <div class="keyword-card priority-high">
+    <div class="kw-rank">16</div>
+    <div class="kw-body">
+      <div class="kw-title">IndiGo fuel surcharge 2026 / why are flights so expensive India</div>
+      <div class="kw-note">IndiGo added up to &#8377;10,000/ticket surcharge on international flights (Apr 2). Second hike in 3 weeks. Wego HAS this article. Indian travellers searching for why fares spiked and cheaper alternatives.</div>
+      <div class="kw-tags">
+        <span class="tag tag-growth-high">300%+</span>
+        <span class="tag tag-type-flights">Flights / Pricing</span>
+        <span class="tag tag-priority tag-priority-high">High Priority</span>
+        <span class="tag tag-source">News-derived</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- #17 -->
+  <div class="keyword-card priority-high">
+    <div class="kw-rank">17</div>
+    <div class="kw-body">
+      <div class="kw-title">Airline compensation EU261 war cancellation rights</div>
+      <div class="kw-note">War = "extraordinary circumstances" under EU261, which affects compensation eligibility but not refund rights. High search volume from European pax. Wego doesn't have a dedicated EU261-focused article for this crisis.</div>
+      <div class="kw-tags">
+        <span class="tag tag-growth-high">250%+</span>
+        <span class="tag tag-type-crisis">Crisis / Rights</span>
+        <span class="tag tag-priority tag-priority-high">High Priority</span>
+        <span class="tag tag-source">News-derived</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- #18 -->
+  <div class="keyword-card priority-high">
+    <div class="kw-rank">18</div>
+    <div class="kw-body">
+      <div class="kw-title">Akasa Air Middle East flight cancellation refund 2026</div>
+      <div class="kw-note">Akasa offering free cancellation/reschedule for ME routes until Apr 12. Wego HAS this article &mdash; may need audit since the free cancellation window is about to expire or has expired.</div>
+      <div class="kw-tags">
+        <span class="tag tag-growth-high">300%+</span>
+        <span class="tag tag-type-crisis">Crisis / Airline</span>
+        <span class="tag tag-priority tag-priority-audit">Audit</span>
+        <span class="tag tag-source">News-derived</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- #19 -->
+  <div class="keyword-card priority-medium">
+    <div class="kw-rank">19</div>
+    <div class="kw-body">
+      <div class="kw-title">Cancel for any reason travel insurance 2026</div>
+      <div class="kw-note">CFAR policy inquiries surged 18-fold. Only insurance type that covers war-related cancellations. Wego HAS a dedicated CFAR article. Audit to ensure it reflects "known event" cutoff date and current pricing.</div>
+      <div class="kw-tags">
+        <span class="tag tag-growth-high">250%+</span>
+        <span class="tag tag-type-insurance">Insurance</span>
+        <span class="tag tag-priority tag-priority-medium">Medium</span>
+        <span class="tag tag-source">News-derived</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- #20 -->
+  <div class="keyword-card priority-medium">
+    <div class="kw-rank">20</div>
+    <div class="kw-body">
+      <div class="kw-title">Qantas Middle East flights rerouting 2026</div>
+      <div class="kw-note">Qantas and other Oceania carriers rerouting kangaroo routes. Sydney-London now 28-30 hours via Istanbul. Australian/NZ travellers heavily searching. No dedicated Wego article for Qantas-specific rerouting.</div>
+      <div class="kw-tags">
+        <span class="tag tag-growth-moderate">200%+</span>
+        <span class="tag tag-type-flights">Flights / Routing</span>
+        <span class="tag tag-priority tag-priority-medium">Medium</span>
+        <span class="tag tag-source">News-derived</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- #21 -->
+  <div class="keyword-card priority-medium">
+    <div class="kw-rank">21</div>
+    <div class="kw-body">
+      <div class="kw-title">Is Bahrain airport open / Bahrain airspace reopened April 2026</div>
+      <div class="kw-note">Bahrain reopened airspace post-ceasefire. Wego has articles on Bahrain airport &mdash; needs audit to confirm reopened status and which airlines have returned.</div>
+      <div class="kw-tags">
+        <span class="tag tag-growth-high">300%+</span>
+        <span class="tag tag-type-crisis">Airport Status</span>
+        <span class="tag tag-priority tag-priority-audit">Audit</span>
+        <span class="tag tag-source">News-derived</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- #22 -->
+  <div class="keyword-card priority-medium">
+    <div class="kw-rank">22</div>
+    <div class="kw-body">
+      <div class="kw-title">Flight cancellation proof visa extension 2026</div>
+      <div class="kw-note">1M+ stranded passengers facing visa overstays. Wego HAS a dedicated article. Audit for latest embassy policies and whether ceasefire has changed visa extension rules in UAE, Qatar, Kuwait.</div>
+      <div class="kw-tags">
+        <span class="tag tag-growth-moderate">200%+</span>
+        <span class="tag tag-type-visa">Visa / Documents</span>
+        <span class="tag tag-priority tag-priority-medium">Medium</span>
+        <span class="tag tag-source">News-derived</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- #23 -->
+  <div class="keyword-card priority-medium">
+    <div class="kw-rank">23</div>
+    <div class="kw-body">
+      <div class="kw-title">Finnair flights Asia 2026 / best airline Europe to Asia avoiding Middle East</div>
+      <div class="kw-note">Finnair's Helsinki hub routes flights via Caucasus/Central Asia, adding only 1-2 hours. Positioned as a key workaround carrier. No Wego content on specific carrier alternatives.</div>
+      <div class="kw-tags">
+        <span class="tag tag-growth-moderate">200%+</span>
+        <span class="tag tag-type-flights">Flights / Routing</span>
+        <span class="tag tag-priority tag-priority-medium">Medium</span>
+        <span class="tag tag-source">News-derived</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- #24 -->
+  <div class="keyword-card priority-medium">
+    <div class="kw-rank">24</div>
+    <div class="kw-body">
+      <div class="kw-title">Emirates partner airlines alternative flights 2026</div>
+      <div class="kw-note">Wego HAS this article. Audit to ensure it reflects current partner availability and which codeshare routes are operating vs. suspended post-ceasefire.</div>
+      <div class="kw-tags">
+        <span class="tag tag-growth-moderate">200%+</span>
+        <span class="tag tag-type-crisis">Crisis / Airline</span>
+        <span class="tag tag-priority tag-priority-audit">Audit</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- #25 -->
+  <div class="keyword-card priority-medium">
+    <div class="kw-rank">25</div>
+    <div class="kw-body">
+      <div class="kw-title">Is it safe to fly internationally right now 2026</div>
+      <div class="kw-note">Broad safety query from anxious travellers. Wego HAS a region-by-region risk guide. Audit to incorporate ceasefire developments, EASA advisory extension to Apr 24, and updated risk assessments.</div>
+      <div class="kw-tags">
+        <span class="tag tag-growth-moderate">200%+</span>
+        <span class="tag tag-type-crisis">Crisis / Safety</span>
+        <span class="tag tag-priority tag-priority-audit">Audit</span>
+        <span class="tag tag-source">News-derived</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- #26 -->
+  <div class="keyword-card priority-evergreen">
+    <div class="kw-rank">26</div>
+    <div class="kw-body">
+      <div class="kw-title">How to track flight status during crisis / best flight tracking apps</div>
+      <div class="kw-note">Evergreen utility content. People constantly checking FlightAware, Flightradar24 during disruptions. Wego could capture this with a tools-and-tips guide.</div>
+      <div class="kw-tags">
+        <span class="tag tag-growth-moderate">150%+</span>
+        <span class="tag tag-type-tips">Product / Tips</span>
+        <span class="tag tag-priority tag-priority-evergreen">Evergreen</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- #27 -->
+  <div class="keyword-card priority-evergreen">
+    <div class="kw-rank">27</div>
+    <div class="kw-body">
+      <div class="kw-title">Best airlines for rebooking during flight disruptions</div>
+      <div class="kw-note">Comparison content opportunity: which airlines have the best passenger policies during crises? Emirates vs. Qatar vs. Etihad vs. BA vs. Lufthansa. Evergreen value with current-event hook.</div>
+      <div class="kw-tags">
+        <span class="tag tag-growth-moderate">120%+</span>
+        <span class="tag tag-type-tips">Product / Tips</span>
+        <span class="tag tag-priority tag-priority-evergreen">Evergreen</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- #28 -->
+  <div class="keyword-card priority-evergreen">
+    <div class="kw-rank">28</div>
+    <div class="kw-body">
+      <div class="kw-title">EASA airspace advisory explained / what does EASA advisory mean for flights</div>
+      <div class="kw-note">EASA advisory extended to Apr 24 covering 11 countries. Many travellers don't understand what it means for their bookings. Wego's EASA article exists but could be expanded into a definitive explainer.</div>
+      <div class="kw-tags">
+        <span class="tag tag-growth-moderate">150%+</span>
+        <span class="tag tag-type-tips">Product / Tips</span>
+        <span class="tag tag-priority tag-priority-evergreen">Evergreen</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- THEMATIC CLUSTERS -->
+  <div class="section-title"><span class="icon">&#128218;</span> Thematic Clusters</div>
+  <div class="cluster-grid">
+
+    <div class="cluster-card">
+      <div class="cluster-title">&#9992;&#65039; Gulf Carrier Crisis Guides</div>
+      <div class="cluster-desc">Core cancellation/refund/status articles for every major Gulf airline. Wego has strong coverage here but all articles need post-ceasefire audits with updated waiver dates and capacity numbers.</div>
+      <div class="cluster-keywords">
+        <span class="cluster-kw">Emirates flights cancelled <span class="growth">Breakout</span></span>
+        <span class="cluster-kw">Qatar Airways refund <span class="growth">Breakout</span></span>
+        <span class="cluster-kw">Etihad cancellation policy <span class="growth">Breakout</span></span>
+        <span class="cluster-kw">flydubai flight status <span class="growth">500%+</span></span>
+        <span class="cluster-kw">Gulf Air cancellation <span class="growth">400%+</span></span>
+        <span class="cluster-kw">Kuwait Airways refund <span class="growth">500%+</span></span>
+      </div>
+    </div>
+
+    <div class="cluster-card">
+      <div class="cluster-title">&#127758; International Carrier Suspensions (COVERAGE GAP)</div>
+      <div class="cluster-desc">European, US, and APAC carriers that have suspended ME routes. This is Wego's biggest content gap &mdash; massive search volume with no dedicated articles for most carriers.</div>
+      <div class="cluster-keywords">
+        <span class="cluster-kw">Lufthansa ME cancellation <span class="growth">Breakout</span></span>
+        <span class="cluster-kw">Singapore Airlines ME <span class="growth">Breakout</span></span>
+        <span class="cluster-kw">Air France KLM refund <span class="growth">Breakout</span></span>
+        <span class="cluster-kw">Delta United resume ME <span class="growth">500%+</span></span>
+        <span class="cluster-kw">British Airways Dubai July <span class="growth">350%+</span></span>
+        <span class="cluster-kw">Qantas rerouting 2026 <span class="growth">200%+</span></span>
+      </div>
+    </div>
+
+    <div class="cluster-card">
+      <div class="cluster-title">&#128507; Airport Status Trackers</div>
+      <div class="cluster-desc">Airport-by-airport open/closed status pages. Ceasefire changed the status of several airports (Bahrain, Baghdad, Amman open; Kuwait still closed). All need audits.</div>
+      <div class="cluster-keywords">
+        <span class="cluster-kw">Kuwait airport open <span class="growth">500%+</span></span>
+        <span class="cluster-kw">Dubai airport status <span class="growth">500%+</span></span>
+        <span class="cluster-kw">Doha airport open <span class="growth">400%+</span></span>
+        <span class="cluster-kw">Bahrain airport reopened <span class="growth">300%+</span></span>
+        <span class="cluster-kw">Baghdad airport open <span class="growth">300%+</span></span>
+        <span class="cluster-kw">Amman airport status <span class="growth">250%+</span></span>
+      </div>
+    </div>
+
+    <div class="cluster-card">
+      <div class="cluster-title">&#128176; Pricing & Alternative Routes</div>
+      <div class="cluster-desc">Price impact content and alternative routing guides. Fares up 29%, fuel up 30%. Passengers actively searching for cheaper workarounds. Strong content gap on the pricing angle.</div>
+      <div class="cluster-keywords">
+        <span class="cluster-kw">airfare increase 2026 <span class="growth">400%+</span></span>
+        <span class="cluster-kw">cheap flights avoid ME <span class="growth">Breakout</span></span>
+        <span class="cluster-kw">Turkish Airlines alternative <span class="growth">350%+</span></span>
+        <span class="cluster-kw">Finnair Asia via Helsinki <span class="growth">200%+</span></span>
+        <span class="cluster-kw">IndiGo fuel surcharge <span class="growth">300%+</span></span>
+      </div>
+    </div>
+
+    <div class="cluster-card">
+      <div class="cluster-title">&#128737; Insurance & Passenger Rights</div>
+      <div class="cluster-desc">Travel insurance coverage gaps exposed by the war. CFAR policies surging 18x. EU261 compensation questions. Wego has good base coverage; audit for latest dates and policy updates.</div>
+      <div class="cluster-keywords">
+        <span class="cluster-kw">travel insurance war coverage <span class="growth">Breakout</span></span>
+        <span class="cluster-kw">CFAR insurance 2026 <span class="growth">250%+</span></span>
+        <span class="cluster-kw">EU261 war cancellation <span class="growth">250%+</span></span>
+        <span class="cluster-kw">flight cancellation proof visa <span class="growth">200%+</span></span>
+      </div>
+    </div>
+
+    <div class="cluster-card">
+      <div class="cluster-title">&#128200; Indian Carrier Disruptions</div>
+      <div class="cluster-desc">India-Gulf is one of the world's busiest corridors. IndiGo, Air India, Air India Express, Akasa Air all heavily affected. Wego has strong India coverage &mdash; audit for latest waiver expirations and resumed routes.</div>
+      <div class="cluster-keywords">
+        <span class="cluster-kw">IndiGo Dubai flights status <span class="growth">400%+</span></span>
+        <span class="cluster-kw">Air India ME cancellation <span class="growth">400%+</span></span>
+        <span class="cluster-kw">Akasa Air refund policy <span class="growth">300%+</span></span>
+        <span class="cluster-kw">India-UAE flights resume <span class="growth">350%+</span></span>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- FOOTER -->
+  <div class="footer">
+    <p><strong>Data sources:</strong> Google Trends (via web research proxies), web news scan, blog.wego.com site search &bull; <strong>Date:</strong> 13 April 2026 &bull; <strong>Scope:</strong> Worldwide, airlines focus, US-Iran war context</p>
+    <p style="margin-top:0.5rem;">Growth percentages are estimated from news volume, search result density, and trend signals where direct Google Trends access was limited by infrastructure constraints. Treat as directional indicators.</p>
+    <p style="margin-top:0.5rem;">Generated for <a href="https://blog.wego.com">blog.wego.com</a> editorial team</p>
+  </div>
+
+</div>
+</body>
+</html>
